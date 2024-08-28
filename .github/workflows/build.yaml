@@ -58,7 +58,7 @@ jobs:
         with:
           repository: sonuabraham-aremedia/k8s-manifest-repo
           ref: main
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.ACTION_TOKEN }}
           path: k8s-manifest-repo
 
       - name: Update Kubernetes resources
