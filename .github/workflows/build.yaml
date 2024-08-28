@@ -58,7 +58,7 @@ jobs:
         with:
           repository: sonuabraham-aremedia/k8s-manifest-repo
           ref: main
-          token: ${{ secrets.ACTION_TOKEN }}
+          #token: ${{ secrets.ACTION_TOKEN }}
           path: k8s-manifest-repo
 
       - name: Update Kubernetes resources
@@ -77,4 +77,3 @@ jobs:
           git config --global user.name "github-actions"
           git commit -am "Update image tag"
           git push -u origin main
-
