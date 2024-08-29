@@ -64,7 +64,7 @@ function App(props) {
             <CloudIcon />
           </IconButton>
           <Typography variant="h6" align="center" className={classes.title}>
-            EKS DEMO Blog Sonu's version
+            EKS DEMO Blog Sonu's version # 2
           </Typography>
           {new Date().toLocaleTimeString()}
         </Toolbar>
