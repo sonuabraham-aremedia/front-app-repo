@@ -2,7 +2,7 @@ name: Build Front
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
 
 jobs:
   build:
@@ -16,7 +16,6 @@ jobs:
 
       - name: Build front
         run: |
-          export NODE_OPTIONS=--openssl-legacy-provider
           npm install
           npm run build
 
@@ -48,7 +47,20 @@ jobs:
           echo "::set-output name=ecr_repository::$ECR_REPOSITORY"
           echo "::set-output name=image_tag::$IMAGE_TAG"
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: '${{ steps.login-ecr.outputs.registry}}/${{ steps.image-info.outputs.ecr_repository }}:${{ steps.image-info.outputs.image_tag }}'
+          format: 'table'
+          exit-code: '0'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Push image to Amazon ECR
+        run: |
+          docker push ${{ steps.login-ecr.outputs.registry}}/${{ steps.image-info.outputs.ecr_repository }}:${{ steps.image-info.outputs.image_tag }}
 
       - name: Setup Kustomize
         uses: imranismail/setup-kustomize@v1
@@ -56,7 +68,7 @@ jobs:
       - name: Checkout kustomize repository
         uses: actions/checkout@v2
         with:
-          repository: sonuabraham-aremedia/k8s-manifest-repo
+          repository: /k8s-manifest-repo
           ref: main
           token: ${{ secrets.ACTION_TOKEN }}
           path: k8s-manifest-repo
@@ -77,3 +89,4 @@ jobs:
           git config --global user.name "github-actions"
           git commit -am "Update image tag"
           git push -u origin main
+
